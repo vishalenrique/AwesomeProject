@@ -5,8 +5,8 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useEffect, useRef } from 'react';
+import type { PropsWithChildren } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -16,6 +16,7 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+import { Camera, useCameraDevices } from 'react-native-vision-camera';
 
 import {
   Colors,
@@ -29,7 +30,7 @@ type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
-function Section({children, title}: SectionProps): JSX.Element {
+function Section({ children, title }: SectionProps): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
@@ -57,10 +58,41 @@ function Section({children, title}: SectionProps): JSX.Element {
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const permission = useRef(false);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  useEffect(() => {
+    const getThePermissions = async () => {
+      const cameraPermission = await Camera.requestCameraPermission();
+      await Camera.requestMicrophonePermission();
+      permission.current = cameraPermission === 'authorized';
+    };
+    getThePermissions();
+  }, []);
+
+  const devices = useCameraDevices();
+  const device = devices.back;
+
+  if (device == null) {
+    return (
+      <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center' }}>
+        <Text> No back camera available!</Text>
+      </View>
+    );
+  }
+
+  if (!permission.current) {
+    return (
+      <View style={{ justifyContent: 'center', flex: 1, alignItems: 'center' }}>
+        <Text> Camera Permissions not available!</Text>
+      </View>
+    );
+  }
+
+  return <Camera style={{ flex: 1 }} device={device} isActive />;
 
   return (
     <SafeAreaView style={backgroundStyle}>

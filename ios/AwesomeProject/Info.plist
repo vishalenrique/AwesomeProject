@@ -51,5 +51,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>AwesomeProject needs access to your Camera.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>AwesomeProject needs access to your Microphone.</string>
 </dict>
 </plist>
